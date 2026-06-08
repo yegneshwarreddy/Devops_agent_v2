@@ -1,0 +1,6 @@
+langchain
+langchain_core
+langchain_ollama
+psycopg2-binary
+langgraph
+IPython
