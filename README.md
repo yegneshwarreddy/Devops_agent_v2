@@ -1,66 +1,60 @@
-# DevOps Agent V1 🚀
+# SRECopilot 🚀
 
-A local AI-powered DevOps assistant built using LangChain, Ollama, Docker, Kubernetes, and PostgreSQL memory.
+### Autonomous DevOps AI Agent using LangGraph, LangChain, FastAPI, Docker & LangSmith
 
----
+SRECopilot is an AI-powered DevOps agent designed to automate infrastructure operations across Docker and Kubernetes environments.
 
-## Overview
+The system uses a planning → execution → response workflow built with LangGraph, enabling the agent to reason about user requests, select the correct operational tools, execute commands, and generate structured responses.
 
-DevOps Agent V1 is a command-line AI agent that can perform Docker and Kubernetes operational tasks using tool calling.
-
-The agent uses:
-
-* LangChain Agents
-* Ollama (Llama 3)
-* Docker CLI
-* Kubernetes CLI (kubectl)
-* PostgreSQL for conversation persistence
-
-This project was built primarily for learning:
-
-* LangChain Fundamentals
-* Tool Calling
-* Agent Architectures
-* PostgreSQL Memory
-* Docker Automation
-* Kubernetes Automation
+The project was built to learn and implement production-style AI Agent patterns including planning agents, tool orchestration, observability, evaluation, containerization, and API deployment.
 
 ---
 
-## Features
+# Features
 
-### Docker Tools
+## AI Planning Workflow
 
-#### Container Operations
+* Multi-step task planning
+* Structured tool selection
+* Argument extraction
+* Tool execution
+* Autonomous replanning
+* Final response generation
+
+---
+
+## Docker Operations
+
+### Container Management
 
 * List running containers
 * List all containers
-* Start container
-* Stop container
-* Restart container
-* Remove container
-* Inspect container
+* Start containers
+* Stop containers
+* Restart containers
+* Remove containers
+* Inspect containers
 * View container logs
-* View container resource usage
+* View resource usage
 
-#### Image Operations
+### Image Management
 
 * List images
 * Pull images
-* Inspect images
 * Remove images
+* Inspect images
 
-#### Network Operations
+### Network Management
 
 * List networks
 * Inspect networks
 
-#### Volume Operations
+### Volume Management
 
 * List volumes
 * Inspect volumes
 
-#### System Operations
+### System Operations
 
 * Docker version
 * Docker system information
@@ -68,161 +62,216 @@ This project was built primarily for learning:
 
 ---
 
-### Kubernetes Tools
+## Kubernetes Operations
 
-#### Pod Operations
+### Pod Operations
 
 * List pods
-* Describe pod
+* Describe pods
 * View pod logs
-* Delete pod
+* Delete pods
 
-#### Deployment Operations
+### Deployment Operations
 
 * List deployments
-* Describe deployment
-* Restart deployment
+* Describe deployments
+* Rollout restart deployments
 
-#### Service Operations
+### Service Operations
 
 * List services
 * Describe services
 
-#### Node Operations
+### Cluster Operations
 
 * List nodes
-* Describe node
-
-#### Cluster Operations
-
-* List namespaces
-* View cluster events
+* Describe nodes
 * Cluster information
 * Cluster version
 
 ---
 
-## Architecture
+# Architecture
 
 ```text
 User
-  │
-  ▼
-main.py
-  │
-  ▼
-LangChain Agent
-  │
-  ├──────────────► Docker Tools
-  │
-  ├──────────────► Kubernetes Tools
-  │
-  ▼
-PostgreSQL Memory
+ │
+ ▼
+FastAPI
+ │
+ ▼
+LangGraph Workflow
+ │
+ ├──────────────► Planner
+ │
+ ├──────────────► Executor
+ │
+ ├──────────────► Replanner
+ │
+ └──────────────► Response Generator
+ │
+ ▼
+DevOps Tools
+ │
+ ├──────────────► Docker
+ │
+ └──────────────► Kubernetes
 ```
 
 ---
 
-## Project Structure
+# LangGraph Workflow
 
 ```text
-Devops_agent/
-
-├── agents/
-│   └── devops_agent.py
-│
-├── database/
-│   └── postgres.py
-│
-├── memory/
-│   └── postgres_memory.py
-│
-├── tools/
-│   ├── docker_tools.py
-│   └── k8s_tools.py
-│
-├── utils/
-│   ├── command_runner.py
-│   └── memory_debugger.py
-│
-├── LLM/
-│   └── ollama_llm.py
-│
-├── main.py
-│
-└── requirements.txt
+User Request
+      │
+      ▼
+ Planner
+      │
+      ▼
+ Tool Execution
+      │
+      ▼
+ Replanner
+      │
+      ├── Complete
+      │
+      └── Replan
+               │
+               ▼
+        Tool Execution
+               │
+               ▼
+        Final Response
 ```
 
 ---
 
-## Memory Architecture
+# Evaluation Framework
 
-### Sessions Table
+The project includes custom evaluation pipelines to measure agent quality.
 
-Stores conversations.
+### Planner Evaluation
 
-```sql
-sessions
-```
+Measures whether the planner selects the correct tool.
 
-| Column     |
-| ---------- |
-| session_id |
-| created_at |
-
----
-
-### Chat Messages Table
-
-Stores messages.
-
-```sql
-chat_messages
-```
-
-| Column     |
-| ---------- |
-| id         |
-| session_id |
-| role       |
-| content    |
-| created_at |
-
----
-
-## Database Relationships
+Current Accuracy:
 
 ```text
-sessions
----------
-session_id (PK)
+100%
+```
 
-        │
-        │
-        ▼
+### Argument Extraction Evaluation
 
-chat_messages
----------
-id (PK)
-session_id (FK)
-role
-content
-created_at
+Measures whether the correct tool arguments are extracted.
+
+Current Accuracy:
+
+```text
+100%
+```
+
+### End-to-End Evaluation
+
+Measures task completion across the full workflow.
+
+Current Success Rate:
+
+```text
+100%
 ```
 
 ---
 
-## Technologies Used
+# Observability
+
+Integrated with LangSmith for:
+
+* LLM tracing
+* Workflow tracing
+* Latency monitoring
+* Error monitoring
+* Token tracking
+* Execution debugging
+
+---
+
+# API Deployment
+
+SRECopilot exposes a REST API using FastAPI.
+
+### Start API
+
+```bash
+uvicorn api:app --reload
+```
+
+### Swagger UI
+
+```text
+http://localhost:8000/docs
+```
+
+Example Request:
+
+```json
+{
+  "query": "show running containers"
+}
+```
+
+---
+
+# Docker Deployment
+
+Build Image
+
+```bash
+docker build -t srecopilot .
+```
+
+Run Container
+
+```bash
+docker run -p 8000:8000 srecopilot
+```
+
+---
+
+# Docker Compose
+
+Run Full Stack
+
+```bash
+docker-compose up -d
+```
+
+Services:
+
+* SRECopilot API
+* PostgreSQL Database
+
+---
+
+# Tech Stack
 
 ### AI
 
+* LangGraph
 * LangChain
 * Ollama
-* Llama 3
+* Qwen3
+* LangSmith
+
+### Backend
+
+* FastAPI
+* Python
 
 ### Infrastructure
 
 * Docker
+* Docker Compose
 * Kubernetes
 
 ### Database
@@ -230,136 +279,76 @@ created_at
 * PostgreSQL
 * psycopg2
 
-### Language
-
-* Python 3.12+
-
 ---
 
-## Running The Agent
-
-### Start Ollama
-
-```bash
-ollama serve
-```
-
----
-
-### Pull Model
-
-```bash
-ollama pull llama3
-```
-
----
-
-### Run Agent
-
-```bash
-python main.py
-```
-
----
-
-## Example Prompts
-
-### Docker
+# Project Structure
 
 ```text
-List all running containers
+Devops_agent/
 
-Get logs of nginx
-
-Show docker images
-
-Inspect container nginx
-
-Restart container nginx
-
-Show docker system information
+├── graph/
+│   ├── planner_v2.py
+│   ├── plan_executor.py
+│   ├── replanner_v2.py
+│   ├── plan_response.py
+│   └── workflow_v3.py
+│
+├── tools/
+│   ├── docker_tools.py
+│   └── k8s_tools.py
+│
+├── evaluation/
+│   ├── planner_dataset.py
+│   ├── argument_dataset.py
+│   ├── test_planner_accuracy.py
+│   ├── test_argument_accuracy.py
+│   └── test_e2e.py
+│
+├── database/
+├── memory/
+├── api.py
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
-### Kubernetes
+# Roadmap
 
-```text
-List all pods
+## Current
 
-Describe pod nginx
+* LangGraph Workflow
+* Docker Tooling
+* Kubernetes Tooling
+* FastAPI API
+* Docker Deployment
+* Docker Compose
+* LangSmith Tracing
+* Evaluation Framework
 
-Show pod logs
+## Upcoming
 
-List deployments
-
-Restart deployment frontend
-
-Show cluster info
-```
-
----
-
-## Current Limitations
-
-### V1 Limitations
-
-* No confirmation workflow for destructive actions
-* No workflow orchestration
-* No multi-step planning
-* No human approval node
-* No structured outputs
-* No RBAC controls
-* No streaming responses
-* No observability/tracing
+* Human Approval Workflow
+* RBAC Layer
+* Persistent Agent Memory
+* Grafana Monitoring
+* Prometheus Metrics
+* OpenTelemetry Tracing
+* Cloud Deployment (AWS)
+* Multi-Agent Architecture
 
 ---
 
-## Lessons Learned
+# Screenshots
 
-This project helped understand:
+Add the following screenshots:
 
-* LLMs
-* Tool Calling
-* LangChain Agents
-* Agent Memory
-* PostgreSQL Persistence
-* Docker Automation
-* Kubernetes Automation
+* LangGraph Workflow Graph
+* Swagger UI
+* LangSmith Traces
+* Docker Compose Running Containers
 
 ---
 
-# Version Roadmap
-
-## V1 (Current)
-
-✅ LangChain Agent
-
-✅ Docker Tools
-
-✅ Kubernetes Tools
-
-✅ PostgreSQL Memory
-
-✅ Session Management
-
----
-
-## V2 (Next)
-
-Planned migration to LangGraph.
-
-Features:
-
-* LangGraph Workflows
-* Human Approval Nodes
-* Safety Layer
-* Multi-step Planning
-* Structured Outputs
-* Better Error Handling
-* Agent State Management
-* Tool Routing Logic
-
----
-
-Built as a learning project to understand how real-world AI-powered DevOps agents are designed and implemented.
+Built to explore how production-grade AI-powered Site Reliability Engineering (SRE) and DevOps agents can plan, reason, execute, observe, and improve infrastructure operations autonomously.
