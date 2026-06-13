@@ -4,3 +4,7 @@ langchain_ollama
 psycopg2-binary
 langgraph
 IPython
+langsmith
+python-dotenv
+fastapi
+uvicorn

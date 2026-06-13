@@ -1,6 +1,8 @@
+
 from tools.docker_tools import docker_ps
 from LLM.ollama_llm import llm
 from tools.k8s_tools import get_pods
+from graph.schemas import PlannerOutput
 
 #node 1
 def docker_node(state):
@@ -106,15 +108,19 @@ Question:
 {question}
 """
 
-    response = llm.invoke(prompt)
+    structured_llm = llm.with_structured_output(
+        PlannerOutput
+    )
 
-    route = response.content.strip().lower()
+    response = structured_llm.invoke(
+        prompt
+    )
 
-    state["route"] = route
+    state["route"] = response.route
 
     print(
         f"\n=== PLANNER DECISION ===\n"
-        f"{route}"
+        f"{response.route}"
     )
 
     return state

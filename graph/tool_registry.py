@@ -3,7 +3,7 @@ from tools.docker_tools import *
 from tools.k8s_tools import *
 
 
-TOOLS = {
+TOOL_REGISTRY = {
 
     # Docker
     "docker_ps": docker_ps,

@@ -1,5 +1,7 @@
 from LLM.ollama_llm import llm
 
+from graph.schemas import ToolSelection
+
 
 def k8s_router(state):
 
@@ -33,17 +35,22 @@ get_events
 cluster_info
 cluster_version
 
-
-Return ONLY tool name.
+Return ONLY the tool name.
 
 Question:
 {question}
 """
 
-    response = llm.invoke(prompt)
+    structured_llm = llm.with_structured_output(
+        ToolSelection
+    )
+
+    response = structured_llm.invoke(
+        prompt
+    )
 
     state["tool_name"] = (
-        response.content.strip()
+        response.tool_name
     )
 
     print(

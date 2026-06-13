@@ -30,19 +30,23 @@ from graph.approval import (
     approval_node
 )
 
+from graph.checkpointer import (
+    checkpointer
+)
 
-# ==========================
+
+# ==================================
 # GRAPH BUILDER
-# ==========================
+# ==================================
 
 builder = StateGraph(
     AgentState
 )
 
 
-# ==========================
+# ==================================
 # NODES
-# ==========================
+# ==================================
 
 builder.add_node(
     "planner",
@@ -80,39 +84,27 @@ builder.add_node(
 )
 
 
-# ==========================
+# ==================================
 # ENTRY POINT
-# ==========================
+# ==================================
 
 builder.set_entry_point(
     "planner"
 )
 
 
-# ==========================
+# ==================================
 # MAIN ROUTER
-# ==========================
+# ==================================
 
 def route_decision(state):
 
     return state["route"]
 
 
-# ==========================
-# APPROVAL ROUTER
-# ==========================
-
-def approval_router(state):
-
-    if state["approval_required"]:
-        return "approval"
-
-    return "execute"
-
-
-# ==========================
+# ==================================
 # CONDITIONAL ROUTING
-# ==========================
+# ==================================
 
 builder.add_conditional_edges(
     "planner",
@@ -123,19 +115,10 @@ builder.add_conditional_edges(
     }
 )
 
-builder.add_conditional_edges(
-    "approval_check",
-    approval_router,
-    {
-        "approval": "response",
-        "execute": "executor"
-    }
-)
 
-
-# ==========================
+# ==================================
 # NORMAL EDGES
-# ==========================
+# ==================================
 
 builder.add_edge(
     "docker_router",
@@ -153,6 +136,11 @@ builder.add_edge(
 )
 
 builder.add_edge(
+    "approval_check",
+    "executor"
+)
+
+builder.add_edge(
     "executor",
     "response"
 )
@@ -163,8 +151,10 @@ builder.add_edge(
 )
 
 
-# ==========================
-# COMPILE GRAPH
-# ==========================
+# ==================================
+# COMPILE
+# ==================================
 
-graph = builder.compile()
+graph = builder.compile(
+    checkpointer=checkpointer
+)

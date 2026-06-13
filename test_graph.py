@@ -1,19 +1,49 @@
 from graph.workflow import graph
+from langgraph.types import Command
+
+
+config = {
+    "configurable": {
+        "thread_id": "devops-thread"
+    }
+}
+
+
+question = input(
+    "Enter your DevOps request: "
+)
 
 result = graph.invoke(
     {
-        "user_input": input("Enter your DevOps request: ")
-    }
+        "user_input": question
+    },
+    config=config
 )
 
-print(result["final_answer"])
 
+if "__interrupt__" in result:
 
-# Save graph image
+    interrupt_data = result["__interrupt__"][0]
 
-png_data = graph.get_graph().draw_mermaid_png()
+    print(
+        interrupt_data.value
+    )
 
-with open("graph.png", "wb") as f:
-    f.write(png_data)
+    approval = input(
+        "\nApproval: "
+    )
 
-print("\nGraph saved as graph.png")
+    result = graph.invoke(
+        Command(
+            resume=approval
+        ),
+        config=config
+    )
+
+print(
+    "\nAnswer:\n"
+)
+
+print(
+    result["final_answer"]
+)

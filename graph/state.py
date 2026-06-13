@@ -1,20 +1,40 @@
 from typing import TypedDict
 
+
 class AgentState(TypedDict):
 
+    # User Request
     user_input: str
 
-    route: str             #planner 1 o/p
+    # Planner Output
+    route: str
 
-    tool_name: str         # router o/p (devops or k8s router)
+    # Current Tool
+    tool_name: str
+    tool_args: dict
 
-    tool_args: dict 
-
+    # Approval
     approval_required: bool
-
     approved: bool
-      
 
-    tool_output: str       # node o/p (function op)
+    # Single Tool Output
+    tool_output: str
 
-    final_answer: str       # llm answer
+    # Final Response
+    final_answer: str
+
+    # ======================
+    # Multi-Step Planning
+    # ======================
+
+    plan: list
+
+    current_step: int
+
+    step_results: list
+
+    replan_decision: str
+
+    replan_action: str
+
+    new_plan: list

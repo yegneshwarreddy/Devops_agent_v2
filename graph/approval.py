@@ -1,3 +1,6 @@
+from langgraph.types import interrupt
+
+
 DANGEROUS_TOOLS = {
     "remove_container",
     "remove_image",
@@ -10,8 +13,26 @@ def approval_node(state):
 
     tool_name = state["tool_name"]
 
-    state["approval_required"] = (
-        tool_name in DANGEROUS_TOOLS
-    )
+    if tool_name in DANGEROUS_TOOLS:
+
+        approval = interrupt(
+            f"""
+Approval Required
+
+Tool:
+{tool_name}
+
+Arguments:
+{state['tool_args']}
+
+Type CONFIRM to continue.
+"""
+        )
+
+        if approval.strip().lower() != "confirm":
+
+            raise ValueError(
+                "Operation not approved."
+            )
 
     return state

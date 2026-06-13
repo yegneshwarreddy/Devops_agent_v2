@@ -1,6 +1,8 @@
-import json
-
 from LLM.ollama_llm import llm
+
+from graph.schemas import (
+    ToolArguments
+)
 
 
 def argument_extractor_node(state):
@@ -18,113 +20,116 @@ User Question:
 Selected Tool:
 {tool_name}
 
-Return ONLY valid JSON.
+Extract arguments for the selected tool.
 
-Rules:
+Return arguments as structured data.
+
+Examples:
 
 docker_logs
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 inspect_container
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 restart_container
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 start_container
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 stop_container
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 remove_container
-{{
-    "container_name":"..."
-}}
+container_identifier
 
 inspect_image
-{{
-    "image_name":"..."
-}}
+image_name
 
 pull_image
-{{
-    "image_name":"..."
-}}
+image_name
 
 remove_image
-{{
-    "image_name":"..."
-}}
+image_name
 
 describe_pod
-{{
-    "pod_name":"..."
-}}
+pod_name
 
 pod_logs
-{{
-    "pod_name":"..."
-}}
+pod_name
 
 delete_pod
-{{
-    "pod_name":"..."
-}}
+pod_name
 
 describe_node
-{{
-    "node_name":"..."
-}}
+node_name
 
 describe_service
-{{
-    "service_name":"..."
-}}
+service_name
 
 describe_deployment
+deployment_name
+
+If no arguments are required,
+return empty arguments.
+IMPORTANT:
+
+Return ONLY the arguments.
+
+DO NOT wrap them inside the tool name.
+
+Correct:
+
 {{
-    "deployment_name":"..."
+    "container_identifier":"nginx"
 }}
 
-If no arguments are needed return:
+Incorrect:
 
-{{}}
+{{
+    "docker_logs":{{
+        "container_identifier":"nginx"
+    }}
+}}
+
+The selected tool has already been chosen.
+
+Your ONLY task is to extract argument values.
+
+If the selected tool is describe_deployment and the user says:
+
+"describe deployment backend"
+
+return:
+
+{{
+    "deployment_name":"backend"
+}}
 """
 
-    response = llm.invoke(prompt)
+    structured_llm = llm.with_structured_output(
+        ToolArguments
+    )
 
-    raw_output = response.content.strip()
+    response = structured_llm.invoke(
+        prompt
+    )
 
-    try:
-
-        args = json.loads(
-            raw_output
-        )
-
-    except Exception:
-
-        print(
-            "\n=== ARG PARSE FAILED ===\n"
-        )
-
-        args = {}
-
-    state["tool_args"] = args
+    state["tool_args"] = (
+        response.arguments
+    )
+    if (
+    len(state["tool_args"]) == 1
+    and tool_name in state["tool_args"]
+    ):
+     state["tool_args"] = (
+        state["tool_args"][tool_name]
+    )
 
     print(
         f"\n=== TOOL ARGS ===\n"
-        f"{args}"
+        f"{state['tool_args']}"
     )
 
     return state

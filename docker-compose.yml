@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+
+  postgres:
+
+    image: postgres:16
+
+    container_name: srecopilot-postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: srecopilot
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  srecopilot:
+
+    build: .
+
+    container_name: srecopilot-api
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - postgres
+
+volumes:
+
+  postgres_data:

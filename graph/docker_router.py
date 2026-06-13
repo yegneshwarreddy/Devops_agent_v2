@@ -1,5 +1,7 @@
 from LLM.ollama_llm import llm
 
+from graph.schemas import ToolSelection
+
 
 def docker_router(state):
 
@@ -34,16 +36,23 @@ inspect_volume
 docker_system_info
 docker_version
 docker_disk_usage
-Return ONLY tool name.
+
+Return ONLY the tool name.
 
 Question:
 {question}
 """
 
-    response = llm.invoke(prompt)
+    structured_llm = llm.with_structured_output(
+        ToolSelection
+    )
+
+    response = structured_llm.invoke(
+        prompt
+    )
 
     state["tool_name"] = (
-        response.content.strip()
+        response.tool_name
     )
 
     print(
